@@ -1,33 +1,34 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const cookieSession = require('cookie-session');
+
+const authRoutes = require('./routes/authRoutes');
 const keys = require('./config/keys');
+
+require('./models/User');
+require('../server/services/passport');
 
 const app = express();
 
-passport.use(
-	new GoogleStrategy(
-		{
-			clientID: keys.googleClientID,
-			clientSecret: keys.googleClientSecret,
-			callbackURL: '/auth/google/callback',
-		},
-		(accessToken, refreshToken, profile, done) => {
-			console.log(accessToken);
-			console.log(refreshToken);
-			console.log(profile);
-		},
-	),
-);
-
-app.get(
-	'/auth/google',
-	passport.authenticate('google', {
-		scope: ['profile', 'email'],
+// Tell express about the cookies
+app.use(
+	cookieSession({
+		maxAge: 30 * 24 * 60 * 60 * 1000,
+		keys: [keys.cookieKey],
 	}),
 );
 
-app.get('/auth/google/callback', passport.authenticate('google'));
+// Tell passport to use cookies
+app.use(passport.initialize());
+app.use(passport.session());
+
+authRoutes(app); // This works too instead of that:     require('./routes/authRoutes')(app)
+
+mongoose.connect(keys.mongoURI, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
