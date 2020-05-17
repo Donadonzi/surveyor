@@ -7,7 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const keys = require('./config/keys');
 
 require('./models/User');
-require('../server/services/passport');
+require('./services/passport');
 
 const app = express();
 authRoutes(app); // This works too instead of that:     require('./routes/authRoutes')(app)
@@ -20,13 +20,9 @@ app.use(
 	}),
 );
 
-
-
 // Tell passport to use cookies
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 
 mongoose.connect(keys.mongoURI, {
 	useNewUrlParser: true,
