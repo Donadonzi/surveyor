@@ -19,11 +19,13 @@ app.use(
 	}),
 );
 
+authRoutes(app); // This works too instead of that:     require('./routes/authRoutes')(app)
+
 // Tell passport to use cookies
 app.use(passport.initialize());
 app.use(passport.session());
 
-authRoutes(app); // This works too instead of that:     require('./routes/authRoutes')(app)
+
 
 mongoose.connect(keys.mongoURI, {
 	useNewUrlParser: true,
