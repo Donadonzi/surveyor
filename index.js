@@ -10,6 +10,7 @@ require('./models/User');
 require('../server/services/passport');
 
 const app = express();
+authRoutes(app); // This works too instead of that:     require('./routes/authRoutes')(app)
 
 // Tell express about the cookies
 app.use(
@@ -19,7 +20,7 @@ app.use(
 	}),
 );
 
-authRoutes(app); // This works too instead of that:     require('./routes/authRoutes')(app)
+
 
 // Tell passport to use cookies
 app.use(passport.initialize());
