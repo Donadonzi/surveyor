@@ -23,28 +23,14 @@ passport.use(
 			callbackURL: '/auth/google/callback',
 			proxy: true,
 		},
-		// async (accessToken, refreshToken, profile, done) => {
-		// 	const user = await User.findOne({ googleId: profile.id });
-		// 	if (user) {
-		// 		console.log('User already exists!');
-		// 		done(null, user); // first arg = error, second = we send back the user we found to passport
-		// 	} else {
-		// 		const user = new User({ googleId: profile.id });
-		// 		await user.save();
-		// 		console.log('Saved new user');
-		// 		done(null, user);
-		// 	}
-		// },
-		(accessToken, refreshToken, profile, done) => {
-			User.findOne({ googleId: profile.id }).then((existingUser) => {
-				if (existingUser) {
-					done(null, existingUser);
-				} else {
-					new User({ googleId: profile.id }).save().then((user) => {
-						done(null, user);
-					});
-				}
-			});
+		async (accessToken, refreshToken, profile, done) => {
+			const existingUser = await User.findOne({ googleId: profile.id });
+			if (existingUser) {
+				done(null, existingUser); // first arg = error, second = we send back the user we found to passport
+			} else {
+				const user = await new User({ googleId: profile.id }).save();
+				done(null, user);
+			}
 		},
 	),
 );
