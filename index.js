@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const cookieSession = require('cookie-session');
+const bodyParser = require('body-parser');
 
 const authRoutes = require('./routes/authRoutes');
 const keys = require('./config/keys');
@@ -10,6 +11,9 @@ require('./models/User');
 require('./services/passport');
 
 const app = express();
+
+// Use body-parser as a middleware to parse the request body and make it availabe at req.body
+app.use(bodyParser.json());
 
 // Tell express about the cookies
 app.use(
@@ -24,6 +28,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 authRoutes(app); // This works too instead of that:     require('./routes/authRoutes')(app)
+require('./routes/billingRoutes')(app);
 
 mongoose.connect(keys.mongoURI, {
 	useNewUrlParser: true,

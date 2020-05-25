@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import Payments from './Payments';
+
 class Header extends React.Component {
 	renderContent() {
 		switch (this.props.auth) {
@@ -14,11 +16,17 @@ class Header extends React.Component {
 					</li>
 				);
 			default:
-				return (
-					<li>
+				return [
+					<li key="1">
+						<Payments />
+					</li>,
+					<li key="3" style={{ margin: '0 10px' }}>
+						Credits: {this.props.auth.credits}
+					</li>,
+					<li key="2">
 						<a href="/api/logout">Log out</a>
-					</li>
-				);
+					</li>, // I added the key just to make the warning go away. We are not using those keys
+				];
 		}
 	}
 	render() {
