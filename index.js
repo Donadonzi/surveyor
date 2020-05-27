@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const keys = require('./config/keys');
 
 require('./models/User');
+require('./models/Survey');
 require('./services/passport');
 
 const app = express();
@@ -29,6 +30,7 @@ app.use(passport.session());
 
 authRoutes(app); // This works too instead of that:     require('./routes/authRoutes')(app)
 require('./routes/billingRoutes')(app);
+require('./routes/syrveyRoutes')(app);
 
 mongoose.connect(keys.mongoURI, {
 	useNewUrlParser: true,
