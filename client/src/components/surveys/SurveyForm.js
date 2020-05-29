@@ -3,52 +3,12 @@ import { reduxForm, Field } from 'redux-form';
 import { Link } from 'react-router-dom';
 import SurveyField from './SurveyField';
 import validateEmails from '../../utils/validateEmails';
-
-const FIELDS = [
-	{ label: 'Survey Title', name: 'title' },
-	{ label: 'Subject Line', name: 'subject' },
-	{ label: 'Email Body', name: 'body' },
-	{ label: 'Recipient List', name: 'emails' },
-];
+import formFields from './formFields';
 
 class SurveyForm extends React.Component {
-	/////// Refactored this al DRY ! ///////
-	// renderFields() {
-	// 	return (
-	// <div>
-	// 	<Field
-	// 		type="text"
-	// 		name="title"
-	// 		component={SurveyField}
-	// 		label="Survey Title"
-	// 	/>
-
-	// 	<Field
-	// 		type="text"
-	// 		name="subject"
-	// 		component={SurveyField}
-	// 		label="Subject Line"
-	// 	/>
-
-	// 	<Field
-	// 		type="text"
-	// 		name="body"
-	// 		component={SurveyField}
-	// 		label="Email Body"
-	// 	/>
-
-	// 	<Field
-	// 		type="text"
-	// 		name="emails"
-	// 		component={SurveyField}
-	// 		label="Recipient List"
-	// 	/>
-	// </div>
-	// 	);
-	// }
 
 	renderFields() {
-		return FIELDS.map(({ label, name }) => {
+		return formFields.map(({ label, name }) => {
 			return (
 				<Field
 					key={name}
@@ -65,10 +25,7 @@ class SurveyForm extends React.Component {
 		return (
 			<div>
 				{/* We wrap the Field component in <form> to be able to submit it */}
-				<form
-					onSubmit={this.props.handleSubmit((values) =>
-						console.log(values, 'khar'),
-					)}>
+				<form onSubmit={this.props.handleSubmit(this.props.onSurveySubmit)}>
 					{this.renderFields()}
 					<Link to="/surveys" className="red btn-flat white-text">
 						Cancel
@@ -86,9 +43,9 @@ class SurveyForm extends React.Component {
 function validate(values) {
 	const errors = {};
 
-	errors.emails = validateEmails(values.emails || ''); // || '' ==> Cuz when the app bootas up, the list is empty so throws an error of not being able to read blah blah
+	errors.recipients = validateEmails(values.recipients || ''); // || '' ==> Cuz when the app boots up, the list is empty so throws an error of not being able to read blah blah
 
-	FIELDS.forEach(({ name }) => {
+	formFields.forEach(({ name }) => {
 		if (!values[name]) {
 			errors[name] = `This field is required.`;
 		}
@@ -100,4 +57,5 @@ function validate(values) {
 export default reduxForm({
 	validate,
 	form: 'surveyForm',
+	destroyOnUnmount: false,
 })(SurveyForm);
