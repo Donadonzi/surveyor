@@ -39,8 +39,12 @@ class Mailer extends helper.Mail {
 		const personalize = new helper.Personalization();
 
 		this.recipients.forEach((recipient) => {
-			personalize.addTo(recipient);
+			personalize.addBcc(recipient);
 		});
+
+		// I did this coz it's neccassary that we provide at least one to email for sendgrid
+		const myEmail = new helper.Email('donadonzi@gmail.com');
+		personalize.addTo(myEmail);
 		this.addPersonalization(personalize);
 	}
 

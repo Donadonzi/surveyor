@@ -23,7 +23,13 @@ const SurveyReview = (props) => {
 				Back
 			</button>
 			<button
-				onClick={() => props.submitSurvey(props.formValues, props.history)}
+				onClick={() => {
+					if (props.auth.credits <= 0) {
+						alert('No enough credits!');
+					} else {
+						props.submitSurvey(props.formValues, props.history);
+					}
+				}}
 				className="green btn-flat right white-text">
 				Send Survey
 				<i className="material-icons right">email</i>
@@ -33,7 +39,8 @@ const SurveyReview = (props) => {
 };
 
 function mapStateToProps(state) {
-	return { formValues: state.form.surveyForm.values };
+	return { formValues: state.form.surveyForm.values, auth: state.auth };
 }
+
 
 export default connect(mapStateToProps, actions)(withRouter(SurveyReview));
