@@ -11,10 +11,21 @@ const mongoose = require('mongoose');
 const Survey = mongoose.model('surveys'); // Rquired it in differently to avoid possible issues when testing
 
 module.exports = (app) => {
+	////////// Route of the user's dashboard. It must show a list of surveys /////////
+	app.get('/api/surveys', requireLogin, async (req, res) => {
+		const surveys = await Survey.find({ _user: req.user.id }).select({
+			recipients: false,
+		}); // equals:  {recipients: 0}
+
+		res.send(surveys);
+	});
+
+	/////// Redirect route for users after clicking in the email /////////
 	app.get('/api/surveys/:surveyId/:choice', (req, res) => {
 		res.send('Thanks for voting!');
 	});
 
+	///////// Handle click events received from sendgrid webhook /////////
 	app.post('/api/surveys/webhooks', (req, res) => {
 		const p = new Path('/api/surveys/:surveyId/:choice');
 		_.chain(req.body)
@@ -35,7 +46,10 @@ module.exports = (app) => {
 					{
 						_id: event.surveyId,
 						recipients: {
-							$elemMatch: { email: event.email, responded: false },
+							$elemMatch: {
+								email: event.email,
+								responded: false,
+							},
 						},
 					},
 					{
@@ -62,6 +76,7 @@ module.exports = (app) => {
 		// res.send({});
 	});
 
+	///////// Route for sending the surveys /////////
 	app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
 		const { title, subject, body, recipients } = req.body;
 		const survey = new Survey({
