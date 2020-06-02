@@ -11,14 +11,13 @@ const mongoose = require('mongoose');
 const Survey = mongoose.model('surveys'); // Rquired it in differently to avoid possible issues when testing
 
 module.exports = (app) => {
-	app.get('/api/surveys/thanks', (req, res) => {
+	app.get('/api/surveys/:surveyId/:choice', (req, res) => {
 		res.send('Thanks for voting!');
 	});
 
 	app.post('/api/surveys/webhooks', (req, res) => {
-		console.log(req.body);
 		const p = new Path('/api/surveys/:surveyId/:choice');
-		const events = _.chain(req.body)
+		_.chain(req.body)
 			.map((event) => {
 				const match = p.test(new URL(event.url).pathname);
 				if (match) {
@@ -31,9 +30,23 @@ module.exports = (app) => {
 			})
 			.compact()
 			.uniqWith((a, b) => a.email === b.email && a.surveyId === b.surveyId) // Cuz I read in Q&A that uniqBy doesn't accept third argument
+			.each((event) => {
+				Survey.updateOne(
+					{
+						_id: event.surveyId,
+						recipients: {
+							$elemMatch: { email: event.email, responded: false },
+						},
+					},
+					{
+						$inc: { [event.choice]: 1 },
+						$set: { 'recipients.$.responded': true },
+						lastResponded: new Date(),
+					},
+				).exec();
+			})
 			.value();
 
-		console.log(events);
 		res.send({});
 
 		// Refactored this to the above shorthand with chaining
