@@ -1,3 +1,7 @@
+const _ = require('lodash');
+const { Path } = require('path-parser');
+const { URL } = require('url');
+
 const requireLogin = require('../middlewares/requireLogin');
 const requireCredits = require('../middlewares/requireCredits');
 const Mailer = require('../services/Mailer');
@@ -13,7 +17,36 @@ module.exports = (app) => {
 
 	app.post('/api/surveys/webhooks', (req, res) => {
 		console.log(req.body);
-		res.send('Thanks');
+		const p = new Path('/api/surveys/:surveyId/:choice');
+		const events = _.chain(req.body)
+			.map((event) => {
+				const match = p.test(new URL(event.url).pathname);
+				if (match) {
+					return {
+						surveyId: match.surveyId,
+						choice: match.choice,
+						email: event.email,
+					};
+				}
+			})
+			.compact()
+			.uniqWith((a, b) => a.email === b.email && a.surveyId === b.surveyId) // Cuz I read in Q&A that uniqBy doesn't accept third argument
+			.value();
+
+		console.log(events);
+		res.send({});
+
+		// Refactored this to the above shorthand with chaining
+		// const events = _.map(req.body, (event) => {
+		// 	const match = p.test(new URL(event.url).pathname);
+		// 	if (match) {
+		// 		return { surveyId: match.surveyId, choice: match.choice, email: event.email };
+		// 	}
+		// });
+		// const compactEvents = _.compact(events);
+		// const uniqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
+		// console.log(uniqueEvents);
+		// res.send({});
 	});
 
 	app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
