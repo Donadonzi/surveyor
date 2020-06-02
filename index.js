@@ -30,7 +30,7 @@ app.use(passport.session());
 
 authRoutes(app); // This works too instead of that:     require('./routes/authRoutes')(app)
 require('./routes/billingRoutes')(app);
-require('./routes/syrveyRoutes')(app);
+require('./routes/surveyRoutes')(app);
 
 mongoose.connect(keys.mongoURI, {
 	useNewUrlParser: true,
