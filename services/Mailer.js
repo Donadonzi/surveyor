@@ -43,7 +43,7 @@ class Mailer extends helper.Mail {
 		});
 
 		// I did this coz it's neccassary that we provide at least one to email for sendgrid
-		const myEmail = new helper.Email('donadonzi@gmail.com');
+		const myEmail = new helper.Email('test@example.com');
 		personalize.addTo(myEmail);
 		this.addPersonalization(personalize);
 	}
