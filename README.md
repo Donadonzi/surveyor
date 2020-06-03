@@ -1,4 +1,4 @@
-# surveyor
+# Surveyor App
 
 *	An application for sending out surveys and collecting back data, built using `Node.js`, `Express`, `React.js`, `Redux/Redux Form` and `MongoDB Atlas`
 * User login on server side with `Google OAuth` and `Passport.js`
